@@ -1,0 +1,11 @@
+---
+
+- name: Setup things
+  become: true
+  hosts: all
+
+  tasks:
+    - name: Do a thing
+      file: 
+        path: /var/lib/test
+        state: present
