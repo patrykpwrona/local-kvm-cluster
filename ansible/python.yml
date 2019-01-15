@@ -1,0 +1,24 @@
+---
+
+- hosts: all
+  gather_facts: False
+
+  tasks:
+  - name: check python
+    raw: test -e '/usr/bin/python'
+    register: python
+    failed_when: python.rc > 1
+    check_mode: no
+
+  - name: check python3
+    raw: test -x '/usr/bin/python3'
+    register: python3
+    when: python.rc != 0
+    failed_when: python.rc > 1
+    check_mode: no
+
+  - name: set default interpreter to python3
+    raw: ln -s '/usr/bin/python3' '/usr/bin/python'
+    when: ( python.rc != 0 ) and ( python3 is defined ) and ( python3.rc == 0 )
+    become: yes
+

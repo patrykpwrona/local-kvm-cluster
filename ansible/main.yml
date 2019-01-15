@@ -1,4 +1,5 @@
 ---
+- include: python.yml
 
 - name: Setup things
   become: true
@@ -7,5 +8,5 @@
   tasks:
     - name: Do a thing
       file: 
-        path: /var/lib/test
-        state: present
+        path: /opt/anisble-test
+        state: touch

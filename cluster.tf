@@ -39,16 +39,17 @@ resource "libvirt_network" "terra_network" {
   addresses = ["10.50.0.0/24"]
   mode      = "nat"
   autostart = "true"
-  # dhcp {
-  #   enabled = true
-  # }
+   dhcp {
+     enabled = true
+   }
 }
 
 # Use CloudInit to add our ssh-key to the instance
 resource "libvirt_cloudinit_disk" "terra_commoninit" {
-  name      = "terra_commoninit.iso"
-  pool      = "libvirt_pool" # name of resource pool in libvirt
-  user_data = "${data.template_file.user_data.rendered}"
+  name           = "terra_commoninit.iso"
+  pool           = "libvirt_pool" # name of resource pool in libvirt
+  user_data      = "${data.template_file.user_data.rendered}"
+#  network_config = "${data.template_file.network_config.rendered}"
 }
 
 # Get CloudInit config from file in our terraform code directory
@@ -56,7 +57,14 @@ data "template_file" "user_data" {
   template = "${file("${path.module}/ubuntu-cloud-config.cfg")}"
 }
 
-# Create the machines (in KVM called domain)
+# Get CloudInit network config from file in our terraform code directory
+#data "template_file" "network_config" {
+#  template = "${file("${path.module}/network-config.cfg")}"
+#  vars
+#}
+
+
+# Create the machines (in KVM called domains)
 resource "libvirt_domain" "terra_machine" {
   count = "${var.number_of_instances}"
   name = "terra_host${count.index}"
@@ -121,7 +129,7 @@ resource "libvirt_domain" "terra_machine" {
 #    }
 
     working_dir = "./ansible/"
-    command     = "ansible-playbook -u pw -i 10.50.0.${count.index + 100} setup.yml -e 'ansible_user=pw ansible_ssh_pass=toor123 ansible_sudo_pass=toor123' "
+    command     = "ansible-playbook -u pw -i 10.50.0.${count.index + 100}, main.yml -e 'ansible_user=pw ansible_ssh_pass=toor123 ansible_sudo_pass=toor123' "
   }
 
 }
