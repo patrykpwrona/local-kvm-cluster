@@ -1,0 +1,8 @@
+network:
+  version: 2
+  ethernets:
+    {{ host_ethernet_name.stdout }}:
+      addresses: [{{ host_ethernet_ip.stdout}}/24]
+      gateway4: {{host_gateway.stdout}}
+      nameservers:
+        addresses: [{{ host_gateway.stdout}}]

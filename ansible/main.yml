@@ -1,6 +1,8 @@
 ---
 - include: python.yml
 
+- include: network_netplan.yml
+
 - name: Setup things
   become: true
   hosts: all
@@ -8,5 +10,5 @@
   tasks:
     - name: Do a thing
       file: 
-        path: /opt/anisble-test
+        path: /opt/ansible-test
         state: touch

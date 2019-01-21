@@ -1,0 +1,46 @@
+---
+# Make network configuration persistent - write it no netplan config
+#
+- hosts: all
+  become: yes
+  tasks:
+
+  - name: "Get current ip on ethernet interface"
+    shell: "ip route get 8.8.8.8 | grep -o 'src.*' | cut -d' ' -f2"
+    register: host_ethernet_ip
+
+  - name: "Get current gateway"
+    shell: "ip route get 8.8.8.8 | grep -o 'via.*' | cut -d' ' -f2"
+    register: host_gateway
+
+  - name: "Get ethernet interface name"
+    shell: "ip route get 8.8.8.8 | grep -o 'dev.*' | cut -d' ' -f2"
+    register: host_ethernet_name
+
+  - name: "Print the IP"
+    debug: 
+      msg: "{{ host_ethernet_ip.stdout }}" 
+
+  - name: "Print the gateway"
+    debug:
+      msg: "{{ host_gateway.stdout }}"
+
+  - name: "Print ethernet interface name"
+    debug:
+      msg: "{{ host_ethernet_name.stdout }}"
+
+  - name: "Template netplan config file"
+    template:
+      src: 50-cloud-init.yaml
+      dest: /etc/netplan/50-cloud-init.yaml
+
+  - name: "Check is netplan is valid"
+    shell: netplan generate --debug
+    register: netplan_generate_result
+
+  - name: "Print netplan generate debug result"
+    debug:
+      msg: "{{ netplan_generate_result }}"
+
+  - name: "Apply netplan"
+    shell: netplan apply

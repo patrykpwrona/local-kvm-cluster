@@ -1,0 +1,6 @@
+.terraform/
+*.tfstate
+*.tfstate.backup
+pl*
+ansible/main.retry
+*.cfg
