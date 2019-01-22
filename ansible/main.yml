@@ -3,12 +3,13 @@
 
 - include: network_netplan.yml
 
-- name: Setup things
+  
+- name: Provision host
   become: true
   hosts: all
 
   tasks:
-    - name: Do a thing
-      file: 
-        path: /opt/ansible-test
-        state: touch
+    - name: Set hostname
+      hostname:
+        name: "{{ hostname }}"
+      when: hostname is defined

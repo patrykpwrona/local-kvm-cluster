@@ -1,18 +1,18 @@
-# Instance the provider - local KVM/QEMU connection
-provider "libvirt" {
-  uri = "qemu:///system"
-}
-
-# Number of instances to create
+##### Parameters #####
 variable "number_of_instances" {
-  description = "How many machines to create"
+  description = "Number of VM instances to create"
   default     = 3
 }
 
-# Instance disk
 variable "instance_disk_size" {
-  description = "Disk size of instance in GB"
+  description = "Size of instance root disk in GB"
   default     = 5 # in GB
+}
+##########
+
+# Instance the provider - local KVM/QEMU connection
+provider "libvirt" {
+  uri = "qemu:///system"
 }
 
 # We fetch the latest ubuntu release image from their mirrors and create base image
@@ -49,20 +49,12 @@ resource "libvirt_cloudinit_disk" "terra_commoninit" {
   name           = "terra_commoninit.iso"
   pool           = "libvirt_pool" # name of resource pool in libvirt
   user_data      = "${data.template_file.user_data.rendered}"
-#  network_config = "${data.template_file.network_config.rendered}"
 }
 
 # Get CloudInit config from file in our terraform code directory
 data "template_file" "user_data" {
   template = "${file("${path.module}/ubuntu-cloud-config.cfg")}"
 }
-
-# Get CloudInit network config from file in our terraform code directory
-#data "template_file" "network_config" {
-#  template = "${file("${path.module}/network-config.cfg")}"
-#  vars
-#}
-
 
 # Create the machines (in KVM called domains)
 resource "libvirt_domain" "terra_machine" {
@@ -105,11 +97,10 @@ resource "libvirt_domain" "terra_machine" {
     autoport = "true"
   }
 
-
-# Install python3 and wait for server to be ready - actually this is only to wait when SSH on server will be ready
+# Connect to server by ssh - we do this so the terraform will wait for machines to be ready
   provisioner "remote-exec" {
     inline = [
-      "touch i-am-remote-exec"
+      "touch remote-exec-check"
     ]
 
     connection {
@@ -124,12 +115,11 @@ resource "libvirt_domain" "terra_machine" {
 # Run ansible from local host (laptop)
   provisioner "local-exec" {
 #    environment {
-#      PUBLIC_IP  = "${self.ipv4_address}"
-#      PRIVATE_IP = "${self.ipv4_address_private}"
+#      PUBLIC_IP_EXAMPLE_VAR  = "${self.ipv4_address}"
 #    }
 
     working_dir = "./ansible/"
-    command     = "ansible-playbook -u pw -i 10.50.0.${count.index + 100}, main.yml -e 'ansible_user=pw ansible_ssh_pass=toor123 ansible_sudo_pass=toor123' "
+    command     = "ansible-playbook -u pw -i 10.50.0.${count.index + 100}, main.yml -e 'ansible_user=pw ansible_ssh_pass=toor123 ansible_sudo_pass=toor123 hostname=terra_host${count.index}' "
   }
 
 }
