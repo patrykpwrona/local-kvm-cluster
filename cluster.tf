@@ -6,9 +6,19 @@ variable "number_of_instances" {
 
 variable "instance_disk_size" {
   description = "Size of instance root disk in GB"
-  default     = 5 # in GB
+  default     = 10 # in GB
 }
-##########
+
+variable "instance_cpus" {
+  description = "Number of CPU core per instance"
+  default     = 2
+}
+
+variable "instance_ram" {
+  description = "Size of instance RAM in GB"
+  default     = 2048 # in MB
+}
+#########
 
 # Instance the provider - local KVM/QEMU connection
 provider "libvirt" {
@@ -60,8 +70,8 @@ data "template_file" "user_data" {
 resource "libvirt_domain" "terra_machine" {
   count = "${var.number_of_instances}"
   name = "terra_host${count.index}"
-  memory = "1024" # in MB
-  vcpu = 1
+  memory = "${var.instance_ram}"
+  vcpu = "${var.instance_cpus}"
 
 # Network adapter
   network_interface {
@@ -119,7 +129,7 @@ resource "libvirt_domain" "terra_machine" {
 #    }
 
     working_dir = "./ansible/"
-    command     = "ansible-playbook -u pw -i 10.50.0.${count.index + 100}, main.yml -e 'ansible_user=pw ansible_ssh_pass=toor123 ansible_sudo_pass=toor123 hostname=terra_host${count.index}' "
+    command     = "ansible-playbook -u pw -i 10.50.0.${count.index + 100}, main.yml -e 'ansible_user=pw ansible_ssh_pass=toor123 ansible_sudo_pass=toor123 hostname=terrahost${count.index}' "
   }
 
 }
