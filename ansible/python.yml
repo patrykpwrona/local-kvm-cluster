@@ -1,4 +1,6 @@
 ---
+# Check if python is installed, make python3 default in available
+# (Ubuntu)
 
 - hosts: all
   gather_facts: False

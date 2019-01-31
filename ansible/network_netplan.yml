@@ -5,7 +5,7 @@
   become: yes
   tasks:
 
-  - name: "Get current ip on ethernet interface"
+  - name: "Get current ip on ethernet (public) interface"
     shell: "ip route get 8.8.8.8 | grep -o 'src.*' | cut -d' ' -f2"
     register: host_ethernet_ip
 
@@ -13,7 +13,7 @@
     shell: "ip route get 8.8.8.8 | grep -o 'via.*' | cut -d' ' -f2"
     register: host_gateway
 
-  - name: "Get ethernet interface name"
+  - name: "Get ethernet (public) interface name"
     shell: "ip route get 8.8.8.8 | grep -o 'dev.*' | cut -d' ' -f2"
     register: host_ethernet_name
 
