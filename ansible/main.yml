@@ -13,9 +13,10 @@
       hostname:
         name: "{{ hostname }}"
       when: hostname is defined
-    
-    - name: Apt update
-      shell: apt update
 
-    - name: Apt upgrade
-      shell: apt upgrade -y
+# This is probably getting stucked at grub update (screen for choose to leave or replace config)    
+#    - name: Apt update
+#      shell: apt update
+
+#    - name: Apt upgrade
+#      shell: apt upgrade -y

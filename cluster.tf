@@ -1,7 +1,7 @@
 ##### Parameters #####
 variable "number_of_instances" {
   description = "Number of VM instances to create"
-  default     = 3
+  default     = 6
 }
 
 variable "instance_disk_size" {
@@ -11,12 +11,12 @@ variable "instance_disk_size" {
 
 variable "instance_cpus" {
   description = "Number of CPU core per instance"
-  default     = 2
+  default     = 1
 }
 
 variable "instance_ram" {
   description = "Size of instance RAM in GB"
-  default     = 2048 # in MB
+  default     = 1024 # in MB
 }
 #########
 
@@ -69,7 +69,7 @@ data "template_file" "user_data" {
 # Create the machines (in KVM called domains)
 resource "libvirt_domain" "terra_machine" {
   count = "${var.number_of_instances}"
-  name = "terra_host${count.index}"
+  name = "terrahost${count.index}"
   memory = "${var.instance_ram}"
   vcpu = "${var.instance_cpus}"
 
